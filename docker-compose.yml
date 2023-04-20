@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:14.4-alpine
     platform: linux/x86_64
-    container_name: postgres_spring_hexagonal
+    container_name: postgres_spring_coroutines
     ports:
       - '5432:5432'
     environment:

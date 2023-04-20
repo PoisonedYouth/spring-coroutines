@@ -2,39 +2,64 @@ package com.poisonedyouth.springcoroutines.application.outbound
 
 import com.poisonedyouth.coroutines.domain.model.Post
 import com.poisonedyouth.coroutines.domain.service.port.PostRepositoryPort
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
-import jakarta.persistence.TypedQuery
-import jakarta.persistence.criteria.CriteriaBuilder
-import jakarta.persistence.criteria.CriteriaQuery
-import jakarta.persistence.criteria.Root
+import io.r2dbc.spi.Row
+import io.r2dbc.spi.RowMetadata
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Repository
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import java.time.Instant
 import java.util.UUID
-
+import java.util.function.BiFunction
 
 @Repository
-class PostRepository: PostRepositoryPort {
+class PostRepository(
+    private val databaseClient: DatabaseClient
+) : PostRepositoryPort {
 
-    @PersistenceContext
-    private lateinit var entityManager: EntityManager
-
-
-    override fun findById(id: UUID): Post? {
-       return entityManager.find(PostEntity::class.java, id).toPost()
+    val mapping: BiFunction<Row, RowMetadata, Post> = BiFunction<Row, RowMetadata, Post> { row: Row, _: RowMetadata? ->
+        Post(
+            id = row.getOrThrow("id", UUID::class.java),
+            title = row.getOrThrow("title", String::class.java),
+            content = row.getOrThrow("content", String::class.java),
+            author = row.getOrThrow("author", String::class.java),
+            createdAt = row.getOrThrow("created_at", Instant::class.java),
+            updatedAt = row.getOrThrow("updated_at", Instant::class.java)
+        )
     }
 
-    override fun findAll(): List<Post> {
-        val cb: CriteriaBuilder = entityManager.criteriaBuilder
-        val cq: CriteriaQuery<PostEntity> = cb.createQuery(PostEntity::class.java)
-        val rootEntry: Root<PostEntity> = cq.from(PostEntity::class.java)
-        val all: CriteriaQuery<PostEntity> = cq.select(rootEntry)
-        val allQuery: TypedQuery<PostEntity> = entityManager.createQuery(all)
-        return allQuery.resultList.map { it.toPost() }
+    private fun <T> Row.getOrThrow(name: String, type: Class<T>): T {
+        return this.get(name, type) ?: error("Row with name '$name' not found.")
     }
 
-    override fun save(post: Post): UUID {
-        entityManager.persist(post.toPostEntity())
-        entityManager.flush()
-        return post.id
+
+    override fun findById(id: UUID): Mono<Post?> {
+        return databaseClient
+            .sql("SELECT * FROM Post WHERE id=:id")
+            .bind("id", id)
+            .map(mapping)
+            .one()
+    }
+
+    override fun findAll(): Flux<Post> {
+        return databaseClient
+            .sql("SELECT * FROM Post")
+            .map(mapping)
+            .all()
+    }
+
+    override fun save(post: Post): Mono<UUID> {
+        return databaseClient
+            .sql("INSERT INTO  Post (id, title, content, author, created_at, updated_at) VALUES (:id, :title, :content, :author, :createdAt, :updatedAt)")
+            .filter { statement -> statement.returnGeneratedValues("id") }
+            .bind("id", post.id)
+            .bind("title", post.title)
+            .bind("content", post.content)
+            .bind("author", post.author)
+            .bind("createdAt", post.createdAt)
+            .bind("updatedAt", post.updatedAt)
+            .fetch()
+            .first()
+            .map { result -> result["id"] as UUID }
     }
 }

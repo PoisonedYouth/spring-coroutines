@@ -12,11 +12,13 @@ repositories {
 
 dependencies {
     implementation(project(":domain"))
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.springframework.data:spring-data-r2dbc")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
+    implementation("io.projectreactor:reactor-core:3.5.5")
     runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("org.postgresql:r2dbc-postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
