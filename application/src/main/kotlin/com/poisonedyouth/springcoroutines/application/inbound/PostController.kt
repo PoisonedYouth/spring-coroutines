@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import reactor.core.publisher.Mono
 import java.time.Instant
 import java.util.UUID
 
@@ -19,25 +18,23 @@ class PostController(
 ) {
 
     @GetMapping
-    fun getAllPosts() = postService.getAllPosts()
+    suspend fun getAllPosts() = postService.getAllPosts()
 
     @GetMapping("/{id}")
-    fun getPostById(@PathVariable id: UUID) = postService.getPost(id)
+    suspend fun getPostById(@PathVariable id: UUID) = postService.getPost(id)
 
     @PostMapping
-    fun createPost(@RequestBody post: Mono<PostDto>) = postService.createPost(post.toPost())
+    suspend fun createPost(@RequestBody post: PostDto) = postService.createPost(post.toPost())
 }
 
-private fun Mono<PostDto>.toPost(): Mono<Post> {
+private fun PostDto.toPost(): Post {
     val new = Instant.now()
-    return this.map {
-        Post(
-            id = UUID.randomUUID(),
-            title = it.title,
-            content = it.content,
-            author = it.author,
-            createdAt = new,
-            updatedAt = new
-        )
-    }
+    return Post(
+        id = UUID.randomUUID(),
+        title = title,
+        content = content,
+        author = author,
+        createdAt = new,
+        updatedAt = new
+    )
 }

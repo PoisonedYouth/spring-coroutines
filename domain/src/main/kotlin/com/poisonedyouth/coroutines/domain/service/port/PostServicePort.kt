@@ -1,12 +1,11 @@
 package com.poisonedyouth.coroutines.domain.service.port
 
 import com.poisonedyouth.coroutines.domain.model.Post
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 interface PostServicePort {
-    fun getPost(id: UUID): Mono<Post?>
-    fun getAllPosts(): Flux<Post>
-    fun createPost(post: Mono<Post>): Mono<UUID>
+    suspend fun getPost(id: UUID): Post?
+    suspend fun getAllPosts(): Flow<Post>
+    suspend fun createPost(post: Post): UUID
 }

@@ -3,6 +3,6 @@ plugins {
 }
 
 dependencies{
-    implementation("io.projectreactor:reactor-core:3.5.5")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
 }

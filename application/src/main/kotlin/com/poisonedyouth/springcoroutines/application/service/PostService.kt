@@ -3,26 +3,24 @@ package com.poisonedyouth.springcoroutines.application.service
 import com.poisonedyouth.coroutines.domain.model.Post
 import com.poisonedyouth.coroutines.domain.service.port.PostRepositoryPort
 import com.poisonedyouth.coroutines.domain.service.port.PostServicePort
+import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.util.UUID
-
 
 @Service
 class PostService(
     private val postRepository: PostRepositoryPort
 ) : PostServicePort {
 
-    override fun getPost(id: UUID): Mono<Post?> {
+    override suspend fun getPost(id: UUID): Post? {
         return postRepository.findById(id)
     }
 
-    override fun getAllPosts(): Flux<Post> {
+    override suspend fun getAllPosts(): Flow<Post> {
         return postRepository.findAll()
     }
 
-    override fun createPost(post: Mono<Post>): Mono<UUID> {
+    override suspend fun createPost(post: Post): UUID {
         return postRepository.save(post)
     }
 }
