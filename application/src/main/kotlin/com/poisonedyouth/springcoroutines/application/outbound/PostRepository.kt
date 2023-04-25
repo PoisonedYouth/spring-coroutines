@@ -48,18 +48,20 @@ class PostRepository(
             .all()
     }
 
-    override fun save(post: Post): Mono<UUID> {
-        return databaseClient
-            .sql("INSERT INTO  Post (id, title, content, author, created_at, updated_at) VALUES (:id, :title, :content, :author, :createdAt, :updatedAt)")
-            .filter { statement -> statement.returnGeneratedValues("id") }
-            .bind("id", post.id)
-            .bind("title", post.title)
-            .bind("content", post.content)
-            .bind("author", post.author)
-            .bind("createdAt", post.createdAt)
-            .bind("updatedAt", post.updatedAt)
-            .fetch()
-            .first()
-            .map { result -> result["id"] as UUID }
+    override fun save(post: Mono<Post>): Mono<UUID> {
+        return post.flatMap {
+            databaseClient
+                .sql("INSERT INTO  Post (id, title, content, author, created_at, updated_at) VALUES (:id, :title, :content, :author, :createdAt, :updatedAt)")
+                .filter { statement -> statement.returnGeneratedValues("id") }
+                .bind("id", it.id)
+                .bind("title", it.title)
+                .bind("content", it.content)
+                .bind("author", it.author)
+                .bind("createdAt", it.createdAt)
+                .bind("updatedAt", it.updatedAt)
+                .fetch()
+                .first()
+                .map { result -> result["id"] as UUID }
+        }
     }
 }

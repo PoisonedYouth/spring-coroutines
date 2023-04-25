@@ -22,7 +22,7 @@ class PostService(
         return postRepository.findAll()
     }
 
-    override fun createPost(post: Post): Mono<UUID> {
+    override fun createPost(post: Mono<Post>): Mono<UUID> {
         return postRepository.save(post)
     }
 }

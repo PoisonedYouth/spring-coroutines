@@ -9,5 +9,5 @@ interface PostRepositoryPort {
 
     fun findById(id: UUID): Mono<Post?>
     fun findAll(): Flux<Post>
-    fun save(post: Post): Mono<UUID>
+    fun save(post: Mono<Post>): Mono<UUID>
 }
