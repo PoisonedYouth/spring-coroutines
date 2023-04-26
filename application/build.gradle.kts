@@ -3,7 +3,6 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.8.20"
     kotlin("plugin.spring") version "1.8.20"
-    id("org.jetbrains.kotlin.plugin.noarg") version "1.8.20"
 }
 
 repositories {
@@ -21,8 +20,4 @@ dependencies {
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.4")
     runtimeOnly("org.postgresql:r2dbc-postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-noArg {
-    annotation("jakarta.persistence.Entity")
 }
