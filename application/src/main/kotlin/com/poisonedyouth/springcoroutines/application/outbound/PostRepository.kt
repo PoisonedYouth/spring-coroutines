@@ -7,6 +7,7 @@ import io.r2dbc.spi.RowMetadata
 import kotlinx.coroutines.flow.Flow
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.awaitOne
+import org.springframework.r2dbc.core.awaitOneOrNull
 import org.springframework.r2dbc.core.flow
 import org.springframework.stereotype.Repository
 import java.time.Instant
@@ -34,12 +35,12 @@ class PostRepository(
     }
 
 
-    override suspend fun findById(id: UUID): Post {
+    override suspend fun findById(id: UUID): Post? {
         return databaseClient
             .sql("SELECT * FROM Post WHERE id=:id")
             .bind("id", id)
             .map(mapping)
-            .awaitOne()
+            .awaitOneOrNull()
     }
 
     override suspend fun findAll(): Flow<Post> {
