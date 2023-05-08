@@ -1,14 +1,13 @@
 package com.poisonedyouth.springcoroutines.application.inbound
 
-import com.poisonedyouth.coroutines.domain.model.Post
 import com.poisonedyouth.coroutines.domain.service.port.PostServicePort
+import kotlinx.coroutines.flow.map
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.time.Instant
 import java.util.UUID
 
 @RestController
@@ -18,23 +17,12 @@ class PostController(
 ) {
 
     @GetMapping
-    suspend fun getAllPosts() = postService.getAllPosts()
+    suspend fun getAllPosts() = postService.getAllPosts().map { it.toPostDto() }
 
     @GetMapping("/{id}")
-    suspend fun getPostById(@PathVariable id: UUID) = postService.getPost(id)
+    suspend fun getPostById(@PathVariable id: UUID) = postService.getPost(id)?.toPostDto()
 
     @PostMapping
     suspend fun createPost(@RequestBody post: PostDto) = postService.createPost(post.toPost())
 }
 
-private fun PostDto.toPost(): Post {
-    val new = Instant.now()
-    return Post(
-        id = UUID.randomUUID(),
-        title = title,
-        content = content,
-        author = author,
-        createdAt = new,
-        updatedAt = new
-    )
-}
