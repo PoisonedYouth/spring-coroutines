@@ -9,7 +9,10 @@ class PostRoutes {
 
     @Bean
     fun allPostsRouterFunction(postHandler: PostHandler) = coRouter {
-        "api/posts".nest {
+        "api/posts/".nest {
+            "aggregated".nest {
+                GET("", postHandler::getAllPostsAggregated)
+            }
             GET("", postHandler::getAllPosts)
             GET("{id}", postHandler::getPostById)
             POST("", postHandler::createPost)

@@ -8,4 +8,6 @@ interface PostServicePort {
     suspend fun getPost(id: UUID): Post?
     suspend fun getAllPosts(): Flow<Post>
     suspend fun createPost(post: Post): UUID
+
+    suspend fun getAggregatedPosts(): Flow<Post>
 }

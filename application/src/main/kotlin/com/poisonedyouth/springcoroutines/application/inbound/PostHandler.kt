@@ -40,4 +40,10 @@ class PostHandler(
         val post = postService.createPost(serverRequest.awaitBody(PostDto::class).toPost())
         return ServerResponse.created(URI.create("/api/posts/$post")).json().bodyValueAndAwait(post)
     }
+
+    suspend fun getAllPostsAggregated(serverRequest: ServerRequest): ServerResponse{
+        return ServerResponse.ok()
+            .json()
+            .bodyAndAwait(postService.getAggregatedPosts().map { it.toPostDto() })
+    }
 }
