@@ -9,14 +9,16 @@ interface ExternalApi1 {
 
 @Component
 class ExternalApi1Impl : ExternalApi1 {
-    override fun getPosts() =
-        listOf(
+    override fun getPosts(): List<PostDto> {
+        Thread.sleep(5000)
+        return listOf(
             PostDto(
                 title = "My title",
                 content = "My Content",
                 author = "Me"
             )
         )
+    }
 }
 
 interface ExternalApi2 {
@@ -26,12 +28,14 @@ interface ExternalApi2 {
 
 @Component
 class ExternalApi2Impl : ExternalApi2 {
-    override fun getPosts() =
-        listOf(
+    override fun getPosts(): List<PostDto> {
+        Thread.sleep(4000)
+        return listOf(
             PostDto(
                 title = "My title 2",
                 content = "My Content 2",
                 author = "Me 2"
             )
         )
+    }
 }
