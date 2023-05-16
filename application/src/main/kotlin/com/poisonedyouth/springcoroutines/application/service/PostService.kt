@@ -32,7 +32,7 @@ class PostService(
     }
 
     override suspend fun getAggregatedPosts(): Flow<Post> {
-        val (a, b) = awaitAll(externalApi1.getPosts(), externalApi2.getPosts())
-        return (a.map { it.toPost() } + b.map { it.toPost() }).asFlow()
+        val result = awaitAll(externalApi1.getPosts(), externalApi2.getPosts())
+        return result.flatMap { element -> element.map { it.toPost() } }.asFlow()
     }
 }
