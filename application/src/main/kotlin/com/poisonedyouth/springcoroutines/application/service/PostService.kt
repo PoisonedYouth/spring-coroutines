@@ -9,6 +9,9 @@ import com.poisonedyouth.springcoroutines.application.inbound.toPost
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.withTimeoutOrNull
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -32,7 +35,9 @@ class PostService(
     }
 
     override suspend fun getAggregatedPosts(): Flow<Post> {
-        val result = awaitAll(externalApi1.getPosts(), externalApi2.getPosts())
-        return result.flatMap { element -> element.map { it.toPost() } }.asFlow()
+        return withTimeoutOrNull(4000) {
+            val result = awaitAll(externalApi1.getPosts(), externalApi2.getPosts())
+            result.flatMap { element -> element.map { it.toPost() } }.asFlow()
+        } ?: emptyFlow()
     }
 }
